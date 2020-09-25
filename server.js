@@ -4,6 +4,7 @@ const colors = require('colors');
 const morgan = require('morgan');
 
 const connectDB = require('./config/db');
+const users = require('./routes/users');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -18,6 +19,9 @@ app.use(express.json({ extended: false }));
 app.get('/', (req, res) =>
   res.json({ message: 'Welcome to the Game Maze App' })
 );
+
+// Define Routes
+app.use('/api/users', users);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
