@@ -5,6 +5,7 @@ const morgan = require('morgan');
 
 const connectDB = require('./config/db');
 const users = require('./routes/users');
+const games = require('./routes/games');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -22,6 +23,7 @@ app.get('/', (req, res) =>
 
 // Define Routes
 app.use('/api/users', users);
+app.use('/api/games', games);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
