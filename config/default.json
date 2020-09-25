@@ -1,0 +1,4 @@
+{
+    "mongoURI": "mongodb+srv://didi:didi1234@gamemaze.y7evp.mongodb.net/<dbname>?retryWrites=true&w=majority",
+    "jwtSecret": "secret"
+}
