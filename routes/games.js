@@ -38,7 +38,7 @@ router.post(
     const user = await User.findById(req.user.id);
 
     // Make sure user have admin rights
-    if (user.role !== 'admin')
+    if (user.role !== 'admin' && user.role !== 'super-admin')
       return res.status(403).json({ message: 'No sufficiant rights.' });
 
     const errors = validationResult(req);
@@ -92,8 +92,10 @@ router.put('/update', authenticate, async (req, res) => {
   const user = await User.findById(req.user.id);
 
   // Make sure user have admin rights
-  if (user.role !== 'admin')
+  if (user.role !== 'admin' && user.role !== 'super-admin') {
+    console.log('in if');
     return res.status(403).json({ message: 'No sufficiant rights.' });
+  }
 
   try {
     let game = await Game.findById(id);
@@ -136,7 +138,7 @@ router.delete('/delete', authenticate, async (req, res) => {
   const user = await User.findById(req.user.id);
 
   // Make sure user have admin rights
-  if (user.role !== 'admin')
+  if (user.role !== 'admin' && user.role !== 'super-admin')
     return res.status(403).json({ message: 'No sufficiant rights.' });
 
   try {

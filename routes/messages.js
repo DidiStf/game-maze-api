@@ -33,26 +33,25 @@ router.post(
     [
       body('content', 'Content is required.').not().isEmpty(),
       body('recipient', 'Recipient is required.').not().isEmpty(),
-      body('sender', 'Sender is required.').not().isEmpty(),
     ],
   ],
   async (req, res) => {
     const errors = validationResult(req);
+    const { id } = req.user;
+    const { content, recipient, subject } = req.body;
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
-    const { content, recipient, sender, subject } = req.body;
 
     try {
       // In the database we create two copies of the message, one for each owner (sender and recipient)
       // That way owners can delete their copy of the message independantly of each other
       const newMessageSender = new Message({
         content,
-        owner: sender,
+        owner: id,
         recipient,
-        sender,
+        sender: id,
         subject,
       });
 
@@ -60,7 +59,7 @@ router.post(
         content,
         owner: recipient,
         recipient,
-        sender,
+        sender: id,
         subject,
       });
 

@@ -164,15 +164,19 @@ module.exports = router;
 // @access Private
 router.put('/update', authenticate, async (req, res) => {
   const userData = req.body;
-  const { id, email } = userData;
+  const { id, avatar, dateOfBirth, email, firstName, lastName } = userData;
 
   try {
     let user = await User.findById(id);
 
+    // Make sure user modifies his own profile
+    if (id.toString() !== req.user.id)
+      return res.status(401).json({ message: 'Not authorized' });
+
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     if (email && email !== user.email) {
-      const otherUser = await User.findOne({ email: email });
+      const otherUser = await User.findOne({ email });
 
       if (otherUser)
         return res
@@ -182,12 +186,11 @@ router.put('/update', authenticate, async (req, res) => {
 
     // Build updated user object
     const updatedUser = {
-      avatar: userData.averageRating || user.averageRating,
-      dateOfBirth: userData.dateOfBirth || user.dateOfBirth,
-      email: userData.email || user.email,
-      firstName: userData.firstName || user.firstName,
-      lastName: userData.lastName || user.lastName,
-      username: userData.username || user.username,
+      avatar: avatar || user.avatar,
+      dateOfBirth: dateOfBirth || user.dateOfBirth,
+      email: email || user.email,
+      firstName: firstName || user.firstName,
+      lastName: lastName || user.lastName,
     };
 
     user = await User.findByIdAndUpdate(
@@ -222,18 +225,22 @@ router.put('/update/setAdmin', authenticate, async (req, res) => {
     if (!userToUpdate)
       return res.status(404).json({ message: 'User not found' });
 
+    console.log('userToUpdate', userToUpdate);
+    console.log('userData', userData);
+    console.log('user', user);
+
     // Build updated game object
     const updatedUser = {
       role: userData.role,
     };
 
-    user = await user.findByIdAndUpdate(
+    userToUpdate = await User.findByIdAndUpdate(
       id,
       { $set: updatedUser },
       { new: true }
     );
 
-    res.json(user);
+    res.json(userToUpdate);
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: 'Server Error' });

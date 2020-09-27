@@ -31,23 +31,22 @@ router.post(
   [
     authenticate,
     [
-      body('author', 'Author is required.').not().isEmpty(),
       body('game', 'Game is required.').not().isEmpty(),
       body('title', 'Title is required.').not().isEmpty(),
     ],
   ],
   async (req, res) => {
     const errors = validationResult(req);
+    const { id } = req.user;
+    const { content, game, title } = req.body;
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { author, content, game, title } = req.body;
-
     try {
       const newComment = new UserComment({
-        author,
+        author: id,
         content,
         game,
         title,

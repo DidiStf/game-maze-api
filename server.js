@@ -7,6 +7,7 @@ const connectDB = require('./config/db');
 const comments = require('./routes/comments');
 const games = require('./routes/games');
 const messages = require('./routes/messages');
+const ratings = require('./routes/ratings');
 const users = require('./routes/users');
 
 dotenv.config({ path: './config/config.env' });
@@ -27,6 +28,7 @@ app.get('/', (req, res) =>
 app.use('/api/comments', comments);
 app.use('/api/games', games);
 app.use('/api/messages', messages);
+app.use('/api/ratings', ratings);
 app.use('/api/users', users);
 
 const PORT = process.env.PORT || 5000;
