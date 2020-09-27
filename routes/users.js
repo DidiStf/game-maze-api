@@ -175,7 +175,9 @@ router.put('/update', authenticate, async (req, res) => {
       const otherUser = await User.findOne({ email: email });
 
       if (otherUser)
-        return res.status(400).json({ message: 'This email is already taken' });
+        return res
+          .status(400)
+          .json({ message: 'There is already an account with this email.' });
     }
 
     // Build updated user object
