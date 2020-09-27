@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const GameSchema = mongoose.Schema(
   {
-    averageRating: Number,
+    averageRating: { type: Number, min: 0, max: 5, default: 0 },
     description: String,
     developer: String,
     genres: [{ type: String, required: true }],

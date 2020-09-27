@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const MessageSchema = mongoose.Schema(
   {
     content: { type: String, required: true, min: 5, max: 255 },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'users',
+      required: true,
+    },
     recipient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'users',
@@ -13,7 +18,7 @@ const MessageSchema = mongoose.Schema(
       ref: 'users',
       required: true,
     },
-    subject: { type: String, required: true, min: 3, max: 50 },
+    subject: { type: String, min: 3, max: 50 },
   },
   { timestamps: true }
 );

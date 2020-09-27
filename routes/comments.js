@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 
 const authenticate = require('../middleware/authenticate');
-const UserComment = require('../models/UserComment');
+const UserComment = require('../models/Comment');
 
 const router = express.Router();
 
@@ -71,7 +71,7 @@ router.put('/update', authenticate, async (req, res) => {
 
   // Make sure user owns comment
   if (author.toString() !== req.user.id)
-    return res.status(401).json({ msg: 'Not authorized' });
+    return res.status(401).json({ message: 'Not authorized' });
 
   try {
     let comment = await UserComment.findById(id);
@@ -105,7 +105,7 @@ router.delete('/delete', authenticate, async (req, res) => {
 
   // Make sure user owns comment
   if (author.toString() !== req.user.id)
-    return res.status(401).json({ msg: 'Not authorized' });
+    return res.status(401).json({ message: 'Not authorized' });
 
   try {
     let comment = await UserComment.findById(id);

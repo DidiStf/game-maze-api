@@ -48,7 +48,6 @@ router.post(
     }
 
     const {
-      averageRating,
       description,
       developer,
       genres,
@@ -62,7 +61,6 @@ router.post(
 
     try {
       const newGame = new Game({
-        averageRating,
         description,
         developer,
         genres,
@@ -104,7 +102,6 @@ router.put('/update', authenticate, async (req, res) => {
 
     // Build updated game object
     const updatedGame = {
-      averageRating: gameData.averageRating || game.averageRating,
       description: gameData.description || game.description,
       developer: gameData.developer || game.developer,
       genres: gameData.genres || game.genres,
