@@ -2,8 +2,8 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 
 const authenticate = require('../middleware/authenticate');
-const Game = require('../models/Game');
-const User = require('../models/User');
+const gameService = require('../services/game');
+const userService = require('../services/user');
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ const router = express.Router();
 // @access Public
 router.get('/', async (req, res) => {
   try {
-    const games = await Game.find();
+    const games = await gameService.findAll();
     res.json(games);
   } catch (err) {
     console.error(err.message);
@@ -35,7 +35,7 @@ router.post(
     ],
   ],
   async (req, res) => {
-    const user = await User.findById(req.user.id);
+    const user = await userService.findOneById(req.user.id);
 
     // Make sure user have admin rights
     if (user.role !== 'admin' && user.role !== 'super-admin')
@@ -60,7 +60,7 @@ router.post(
     } = req.body;
 
     try {
-      const newGame = new Game({
+      const newGame = {
         description,
         developer,
         genres,
@@ -70,9 +70,9 @@ router.post(
         releaseDate,
         trailerUrl,
         title,
-      });
+      };
 
-      const game = await newGame.save();
+      const game = await gameService.saveGame(newGame);
 
       res.json(game);
     } catch (err) {
@@ -89,7 +89,7 @@ router.put('/update', authenticate, async (req, res) => {
   const gameData = req.body;
   const { id } = gameData;
 
-  const user = await User.findById(req.user.id);
+  const user = await userService.findOneById(req.user.id);
 
   // Make sure user have admin rights
   if (user.role !== 'admin' && user.role !== 'super-admin') {
@@ -98,7 +98,7 @@ router.put('/update', authenticate, async (req, res) => {
   }
 
   try {
-    let game = await Game.findById(id);
+    let game = await gameService.findOneById(id);
 
     if (!game) return res.status(404).json({ message: 'Game not found' });
 
@@ -115,11 +115,7 @@ router.put('/update', authenticate, async (req, res) => {
       title: gameData.title || game.title,
     };
 
-    game = await Game.findByIdAndUpdate(
-      id,
-      { $set: updatedGame },
-      { new: true }
-    );
+    game = await gameService.updateGameById(id, updatedGame);
 
     res.json(game);
   } catch (err) {
@@ -135,18 +131,18 @@ router.delete('/delete', authenticate, async (req, res) => {
   const gameData = req.body;
   const { id } = gameData;
 
-  const user = await User.findById(req.user.id);
+  const user = await userService.findOneById(req.user.id);
 
   // Make sure user have admin rights
   if (user.role !== 'admin' && user.role !== 'super-admin')
     return res.status(403).json({ message: 'No sufficiant rights.' });
 
   try {
-    let game = await Game.findById(id);
+    let game = await gameService.findOneById(id);
 
     if (!game) return res.status(404).json({ message: 'Game not found' });
 
-    await Game.findByIdAndRemove(id);
+    await gameService.removeGameById(id);
 
     res.json({ message: 'Game deleted' });
   } catch (err) {

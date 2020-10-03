@@ -5,9 +5,11 @@ const config = require('config');
 const { body, validationResult } = require('express-validator');
 
 const authenticate = require('../middleware/authenticate');
-const User = require('../models/User');
+const userService = require('../services/user');
 
 const router = express.Router();
+
+const colors = require('colors');
 
 // @route POST api/users/create
 // @desc Register a user
@@ -36,13 +38,13 @@ router.post(
     const { username, email, password } = req.body;
 
     try {
-      let user = await User.findOne({ email });
+      let user = await userService.findOneByEmail(email);
 
       if (user) {
         return res.status(400).json({ message: 'User already exists' });
       }
 
-      user = await User.findOne({ username });
+      user = await userService.findOneByUsername(username);
 
       if (user) {
         return res
@@ -50,30 +52,13 @@ router.post(
           .json({ message: 'This username is alerady taken' });
       }
 
-      user = new User({
-        username,
-        email,
-        password,
-      });
+      user = await userService.saveUser({ username, email, password });
 
-      const salt = await bcrypt.genSalt(10);
-
-      user.password = await bcrypt.hash(password, salt);
-
-      await user.save();
-
-      const payload = {
-        user: {
-          id: user.id,
-        },
-      };
-
+      const payload = { user: { id: user.id } };
       jwt.sign(
         payload,
         config.get('jwtSecret'),
-        {
-          expiresIn: 360000,
-        },
+        { expiresIn: 360000 },
         (err, token) => {
           if (err) throw err;
           res.json({ token });
@@ -106,8 +91,7 @@ router.post(
 
     const { email, password } = req.body;
     try {
-      let user = await User.findOne({ email });
-
+      const user = await userService.findOneByEmailForAuthentication(email);
       if (!user) {
         return res.status(400).json({ message: 'Inavlid credentials' });
       }
@@ -148,8 +132,9 @@ module.exports = router;
 // @desc Get logged in user
 // @access Private
 router.get('/getOneByToken', authenticate, async (req, res) => {
+  const { id } = req.user;
   try {
-    let user = await User.findById(req.user.id).select('-password');
+    let user = await userService.findOneById(id);
     res.json({ user });
   } catch (err) {
     console.error(err.message);
@@ -167,7 +152,7 @@ router.put('/update', authenticate, async (req, res) => {
   const { id, avatar, dateOfBirth, email, firstName, lastName } = userData;
 
   try {
-    let user = await User.findById(id);
+    let user = await userService.findOneById(id);
 
     // Make sure user modifies his own profile
     if (id.toString() !== req.user.id)
@@ -176,7 +161,7 @@ router.put('/update', authenticate, async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     if (email && email !== user.email) {
-      const otherUser = await User.findOne({ email });
+      const otherUser = await userService.findOneByEmail(email);
 
       if (otherUser)
         return res
@@ -193,11 +178,7 @@ router.put('/update', authenticate, async (req, res) => {
       lastName: lastName || user.lastName,
     };
 
-    user = await User.findByIdAndUpdate(
-      id,
-      { $set: updatedUser },
-      { new: true }
-    );
+    user = await userService.updateUserById(id, updatedUser);
 
     res.json(user);
   } catch (err) {
@@ -213,32 +194,24 @@ router.put('/update/setAdmin', authenticate, async (req, res) => {
   const userData = req.body;
   const { id } = userData;
 
-  const user = await User.findById(req.user.id);
+  const user = await userService.findOneById(req.user.id);
 
   // Make sure user have admin rights
   if (user.role !== 'super-admin')
     return res.status(403).json({ message: 'No sufficiant rights.' });
 
   try {
-    let userToUpdate = await User.findById(id);
+    let userToUpdate = await userService.findOneById(id);
 
     if (!userToUpdate)
       return res.status(404).json({ message: 'User not found' });
-
-    console.log('userToUpdate', userToUpdate);
-    console.log('userData', userData);
-    console.log('user', user);
 
     // Build updated game object
     const updatedUser = {
       role: userData.role,
     };
 
-    userToUpdate = await User.findByIdAndUpdate(
-      id,
-      { $set: updatedUser },
-      { new: true }
-    );
+    userToUpdate = await userService.updateUserById(id, updatedUser);
 
     res.json(userToUpdate);
   } catch (err) {
@@ -254,19 +227,19 @@ router.delete('/delete', authenticate, async (req, res) => {
   const userData = req.body;
   const { id } = userData;
 
-  const user = await User.findById(req.user.id);
+  const user = await userService.findOneById(req.user.id);
 
   // Make sure user have admin rights
   if (user.role !== 'super-admin')
     return res.status(403).json({ message: 'No sufficiant rights.' });
 
   try {
-    let userToDelete = await User.findById(id);
+    let userToDelete = await userService.findOneById(id);
 
     if (!userToDelete)
       return res.status(404).json({ message: 'User not found' });
 
-    await User.findByIdAndRemove(id);
+    await userService.deleteUserById(id);
 
     res.json({ message: 'User deleted' });
   } catch (err) {
