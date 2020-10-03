@@ -10,6 +10,8 @@ const messages = require('./routes/messages');
 const ratings = require('./routes/ratings');
 const users = require('./routes/users');
 
+const ENV = process.env.NODE_ENV;
+const PORT = process.env.PORT || 5000;
 dotenv.config({ path: './config/config.env' });
 
 const app = express();
@@ -31,9 +33,6 @@ app.use('/api/messages', messages);
 app.use('/api/ratings', ratings);
 app.use('/api/users', users);
 
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
-  console.log(
-    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.cyan.bold
-  )
+  console.log(`Server running in ${ENV} mode on port ${PORT}`.cyan.bold)
 );
