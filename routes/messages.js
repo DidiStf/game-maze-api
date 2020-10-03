@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 
 const authenticate = require('../middleware/authenticate');
-const Message = require('../models/Message');
+const messageService = require('../services/message');
 
 const router = express.Router();
 
@@ -13,9 +13,7 @@ router.get('/', authenticate, async (req, res) => {
   const { id } = req.user;
 
   try {
-    const messages = await Message.find({ owner: id }).sort({
-      createdAt: -1,
-    });
+    const messages = await messageService.findByOwnerId(id);
     res.json(messages);
   } catch (err) {
     console.error(err.message);
@@ -47,26 +45,28 @@ router.post(
     try {
       // In the database we create two copies of the message, one for each owner (sender and recipient)
       // That way owners can delete their copy of the message independantly of each other
-      const newMessageSender = new Message({
+      const newMessageSender = {
         content,
         owner: id,
         recipient,
         sender: id,
         subject,
-      });
+      };
 
-      const newMessageRecipient = new Message({
+      const newMessageRecipient = {
         content,
         owner: recipient,
         recipient,
         sender: id,
         subject,
-      });
+      };
 
-      const messageSender = await newMessageSender.save();
-      await newMessageRecipient.save();
+      const message = await messageService.saveMessage(
+        newMessageSender,
+        newMessageRecipient
+      );
 
-      res.json(messageSender);
+      res.json(message);
     } catch (err) {
       console.error(err.message);
       res.status(500).json({ message: 'Server Error' });
@@ -85,11 +85,11 @@ router.delete('/delete', authenticate, async (req, res) => {
     return res.status(401).json({ message: 'Not authorized' });
 
   try {
-    let message = await Message.findById(id);
+    let message = await messageService.findOneById(id);
 
     if (!message) return res.status(404).json({ message: 'Message not found' });
 
-    await Message.findByIdAndRemove(id);
+    await messageService.removeMessageById(id);
 
     res.json({ message: 'Message deleted' });
   } catch (err) {

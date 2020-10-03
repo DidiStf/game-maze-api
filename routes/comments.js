@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 
 const authenticate = require('../middleware/authenticate');
-const UserComment = require('../models/Comment');
+const commentService = require('../services/comment');
 
 const router = express.Router();
 
@@ -13,9 +13,7 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const comments = await UserComment.find({ game: id }).sort({
-      createdAt: -1,
-    });
+    const comments = await commentService.findByGameId(id);
     res.json(comments);
   } catch (err) {
     console.error(err.message);
@@ -45,14 +43,14 @@ router.post(
     }
 
     try {
-      const newComment = new UserComment({
+      const newComment = {
         author: id,
         content,
         game,
         title,
-      });
+      };
 
-      const comment = await newComment.save();
+      const comment = await commentService.saveComment(newComment);
 
       res.json(comment);
     } catch (err) {
@@ -73,7 +71,7 @@ router.put('/update', authenticate, async (req, res) => {
     return res.status(401).json({ message: 'Not authorized' });
 
   try {
-    let comment = await UserComment.findById(id);
+    let comment = await commentService.findOneById(id);
 
     if (!comment) return res.status(404).json({ message: 'Comment not found' });
 
@@ -83,11 +81,7 @@ router.put('/update', authenticate, async (req, res) => {
       title: title || comment.title,
     };
 
-    comment = await UserComment.findByIdAndUpdate(
-      id,
-      { $set: updatedComment },
-      { new: true }
-    );
+    comment = await commentService.updateCommentById(id, updatedComment);
 
     res.json(comment);
   } catch (err) {
@@ -107,11 +101,11 @@ router.delete('/delete', authenticate, async (req, res) => {
     return res.status(401).json({ message: 'Not authorized' });
 
   try {
-    let comment = await UserComment.findById(id);
+    let comment = await commentService.findOneById(id);
 
     if (!comment) return res.status(404).json({ message: 'Comment not found' });
 
-    await UserComment.findByIdAndRemove(id);
+    await commentService.removeCommentById(id);
 
     res.json({ message: 'Comment deleted' });
   } catch (err) {

@@ -2,8 +2,8 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 
 const authenticate = require('../middleware/authenticate');
-const Rating = require('../models/Rating');
-const Game = require('../models/Game');
+const ratingService = require('../services/rating');
+const gameService = require('../services/game');
 
 const router = express.Router();
 
@@ -28,29 +28,27 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const duplicateRating = await Rating.findOne({
-      $and: [{ author: id }, { game }],
-    });
+    const duplicateRating = await ratingService.findDuplicateRating(id, game);
 
     if (duplicateRating)
       return res.status(400).json({ message: 'Game already rated' });
 
     try {
-      const newRating = new Rating({
+      const newRating = {
         author: id,
         game,
         value,
-      });
+      };
 
-      const rating = await newRating.save();
+      const rating = await ratingService.saveRating(newRating);
 
       // Update concerned game average rating
-      const gameRatings = await Rating.find({ game });
+      const gameRatings = await ratingService.findByGameId(game);
       const gameRatingsValues = gameRatings.map(({ value }) => value);
       const averageRating =
         gameRatingsValues.reduce((a, b) => a + b) / gameRatingsValues.length;
 
-      await Game.findByIdAndUpdate(game, { $set: { averageRating } });
+      await gameService.updateGameById(game, { averageRating });
 
       res.json(rating);
     } catch (err) {
@@ -71,7 +69,7 @@ router.put('/update', authenticate, async (req, res) => {
     return res.status(401).json({ message: 'Not authorized' });
 
   try {
-    let rating = await Rating.findById(id);
+    let rating = await ratingService.findOneById(id);
 
     if (!rating) return res.status(404).json({ message: 'Rating not found' });
 
@@ -80,19 +78,15 @@ router.put('/update', authenticate, async (req, res) => {
       value: value || rating.value,
     };
 
-    rating = await Rating.findByIdAndUpdate(
-      id,
-      { $set: updatedRating },
-      { new: true }
-    );
+    rating = await ratingService.updateRatingById(id, updatedRating);
 
     // Update concerned game average rating
-    const gameRatings = await Rating.find({ game });
+    const gameRatings = await ratingService.findByGameId(game);
     const gameRatingsValues = gameRatings.map(({ value }) => value);
     const averageRating =
       gameRatingsValues.reduce((a, b) => a + b) / gameRatingsValues.length;
 
-    await Game.findByIdAndUpdate(game, { $set: { averageRating } });
+    await gameService.updateGameById(game, { averageRating });
 
     res.json(rating);
   } catch (err) {
@@ -112,14 +106,14 @@ router.delete('/delete', authenticate, async (req, res) => {
     return res.status(401).json({ message: 'Not authorized' });
 
   try {
-    let rating = await Rating.findById(id);
+    let rating = await ratingService.findOneById(id);
 
     if (!rating) return res.status(404).json({ message: 'Rating not found' });
 
-    await Rating.findByIdAndRemove(id);
+    await ratingService.removeRatingById(id);
 
     // Update concerned game average rating
-    const gameRatings = await Rating.find({ game });
+    const gameRatings = await ratingService.findByGameId(game);
     const gameRatingsValues = gameRatings.map(({ value }) => value);
     let averageRating = 0;
 
@@ -128,7 +122,7 @@ router.delete('/delete', authenticate, async (req, res) => {
         gameRatingsValues.reduce((a, b) => a + b) / gameRatingsValues.length;
     }
 
-    await Game.findByIdAndUpdate(game, { $set: { averageRating } });
+    await gameService.updateGameById(game, { averageRating });
 
     res.json({ message: 'Rating deleted' });
   } catch (err) {
