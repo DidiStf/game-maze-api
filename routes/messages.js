@@ -6,8 +6,8 @@ const messageService = require('../services/message');
 
 const router = express.Router();
 
-// @route GET api/message/:id
-// @desc Get all messages by user id
+// @route GET api/messages
+// @desc Get all user's messages
 // @access Private
 router.get('/', authenticate, async (req, res) => {
   const { id } = req.user;
