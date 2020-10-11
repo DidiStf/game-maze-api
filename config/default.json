@@ -1,5 +1,4 @@
 {
     "mongoURI": "mongodb+srv://didi:didi1234@gamemaze.y7evp.mongodb.net/game-maze?retryWrites=true&w=majority",
-    "testMongoURI": "mongodb+srv://didi:didi1234@gamemaze.y7evp.mongodb.net/game-maze-test?retryWrites=true&w=majority",
     "jwtSecret": "secret"
 }

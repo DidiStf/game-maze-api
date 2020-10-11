@@ -10,9 +10,9 @@ const messages = require('./routes/messages');
 const ratings = require('./routes/ratings');
 const users = require('./routes/users');
 
+dotenv.config({ path: './config/config.env' });
 const ENV = process.env.NODE_ENV;
 const PORT = process.env.PORT || 5000;
-dotenv.config({ path: './config/config.env' });
 
 const app = express();
 

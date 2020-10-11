@@ -10,7 +10,7 @@ exports.findOneById = (id) => User.findById(id).select('-password');
 exports.findOneByUsername = (username) =>
   User.findOne({ username }).select('-password');
 
-exports.saveUser = async (userData, ...args) => {
+exports.saveUser = async (userData) => {
   const { username, email, password } = userData;
   const user = new User({ username, email, password });
   const salt = await bcrypt.genSalt(10);
