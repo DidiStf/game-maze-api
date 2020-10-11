@@ -20,6 +20,20 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @route GET api/games/:id
+// @desc Get one game by id
+// @access Public
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const game = await gameService.findOneById(id);
+    res.json(game);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 // @route POST api/games/create
 // @desc Add new game
 // @access Private
