@@ -7,7 +7,7 @@ const userService = require('../services/user');
 
 const router = express.Router();
 
-// @route GET api/games
+// @route GET api/games/
 // @desc Get all games
 // @access Public
 router.get('/', async (req, res) => {
@@ -21,12 +21,13 @@ router.get('/', async (req, res) => {
 });
 
 // @route GET api/games/:id
-// @desc Get one game by id
+// @desc Get one game
 // @access Public
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const game = await gameService.findOneById(id);
+    if (!game) return res.status(404).json({ message: 'Game not found' });
     res.json(game);
   } catch (err) {
     console.error(err.message);
@@ -35,7 +36,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // @route POST api/games/create
-// @desc Add new game
+// @desc Add game
 // @access Private
 router.post(
   '/create',
@@ -53,7 +54,7 @@ router.post(
 
     // Make sure user have admin rights
     if (user.role !== 'admin' && user.role !== 'super-admin')
-      return res.status(403).json({ message: 'No sufficiant rights.' });
+      return res.status(403).json({ message: 'No sufficiant rights' });
 
     const errors = validationResult(req);
 
@@ -99,44 +100,61 @@ router.post(
 // @route PUT api/games/update
 // @desc Update game
 // @access Private
-router.put('/update', authenticate, async (req, res) => {
-  const gameData = req.body;
-  const { id } = gameData;
+router.put(
+  '/update',
+  [
+    authenticate,
+    [
+      body('genres', 'Genres is required.').not().isEmpty(),
+      body('imageUrl', 'ImageUrl is required.').not().isEmpty(),
+      body('platforms', 'Platforms is required.').not().isEmpty(),
+      body('title', 'Title is required.').not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    const gameData = req.body;
+    const { id } = gameData;
 
-  const user = await userService.findOneById(req.user.id);
+    const user = await userService.findOneById(req.user.id);
 
-  // Make sure user have admin rights
-  if (user.role !== 'admin' && user.role !== 'super-admin') {
-    console.log('in if');
-    return res.status(403).json({ message: 'No sufficiant rights.' });
+    // Make sure user have admin rights
+    if (user.role !== 'admin' && user.role !== 'super-admin') {
+      console.log('in if');
+      return res.status(403).json({ message: 'No sufficiant rights.' });
+    }
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      let game = await gameService.findOneById(id);
+
+      if (!game) return res.status(404).json({ message: 'Game not found' });
+
+      // Build updated game object
+      const updatedGame = {
+        description: gameData.description || game.description,
+        developer: gameData.developer || game.developer,
+        genres: gameData.genres || game.genres,
+        imageUrl: gameData.imageUrl || game.imageUrl,
+        platforms: gameData.platforms || game.platforms,
+        publisher: gameData.publisher || game.publisher,
+        releaseDate: gameData.releaseDate || game.releaseDate,
+        trailerUrl: gameData.trailerUrl || game.trailerUrl,
+        title: gameData.title || game.title,
+      };
+
+      game = await gameService.updateGameById(id, updatedGame);
+
+      res.json(game);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({ message: 'Server Error' });
+    }
   }
-
-  try {
-    let game = await gameService.findOneById(id);
-
-    if (!game) return res.status(404).json({ message: 'Game not found' });
-
-    // Build updated game object
-    const updatedGame = {
-      description: gameData.description || game.description,
-      developer: gameData.developer || game.developer,
-      genres: gameData.genres || game.genres,
-      imageUrl: gameData.imageUrl || game.imageUrl,
-      platforms: gameData.platforms || game.platforms,
-      publisher: gameData.publisher || game.publisher,
-      releaseDate: gameData.releaseDate || game.releaseDate,
-      trailerUrl: gameData.trailerUrl || game.trailerUrl,
-      title: gameData.title || game.title,
-    };
-
-    game = await gameService.updateGameById(id, updatedGame);
-
-    res.json(game);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
+);
 
 // @route DELETE api/games/delete
 // @desc Delete game

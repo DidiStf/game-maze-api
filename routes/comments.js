@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 
 const authenticate = require('../middleware/authenticate');
 const commentService = require('../services/comment');
+const gameService = require('../services/game');
 
 const router = express.Router();
 
@@ -38,6 +39,11 @@ router.post(
     const { id } = req.user;
     const { content, game, title } = req.body;
 
+    const commentedGame = await gameService.findOneById(game);
+
+    if (!commentedGame)
+      return res.status(404).json({ message: 'Game not found' });
+
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -63,32 +69,53 @@ router.post(
 // @route PUT api/comments/update
 // @desc Update comment
 // @access Private
-router.put('/update', authenticate, async (req, res) => {
-  const { id, author, content, title } = req.body;
+router.put(
+  '/update',
+  [
+    authenticate,
+    [
+      body('game', 'Game is required.').not().isEmpty(),
+      body('title', 'Title is required.').not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    const { id, author, content, title } = req.body;
 
-  // Make sure user owns comment
-  if (author.toString() !== req.user.id)
-    return res.status(401).json({ message: 'Not authorized' });
+    // Make sure user owns comment
+    if (author.toString() !== req.user.id)
+      return res.status(401).json({ message: 'Not authorized' });
 
-  try {
-    let comment = await commentService.findOneById(id);
+    const commentedGame = await gameService.findOneById(game);
 
-    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+    if (!commentedGame)
+      return res.status(404).json({ message: 'Game not found' });
 
-    // Build updated comment object
-    const updatedComment = {
-      content: content || comment.content,
-      title: title || comment.title,
-    };
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-    comment = await commentService.updateCommentById(id, updatedComment);
+    try {
+      let comment = await commentService.findOneById(id);
 
-    res.json(comment);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Server Error' });
+      if (!comment)
+        return res.status(404).json({ message: 'Comment not found' });
+
+      // Build updated comment object
+      const updatedComment = {
+        content: content || comment.content,
+        title: title || comment.title,
+      };
+
+      comment = await commentService.updateCommentById(id, updatedComment);
+
+      res.json(comment);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({ message: 'Server Error' });
+    }
   }
-});
+);
 
 // @route DELETE api/comments/delete
 // @desc Delete comment
@@ -99,6 +126,11 @@ router.delete('/delete', authenticate, async (req, res) => {
   // Make sure user owns comment
   if (author.toString() !== req.user.id)
     return res.status(401).json({ message: 'Not authorized' });
+
+  const commentedGame = await gameService.findOneById(game);
+
+  if (!commentedGame)
+    return res.status(404).json({ message: 'Game not found' });
 
   try {
     let comment = await commentService.findOneById(id);

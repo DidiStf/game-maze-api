@@ -7,6 +7,21 @@ const gameService = require('../services/game');
 
 const router = express.Router();
 
+// @route GET api/ratings/:id
+// @desc Get all ratings by game id
+// @access Public
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const ratings = await ratingService.findByGameId(id);
+    res.json(ratings);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 // @route POST api/ratings/create
 // @desc Add new rating
 // @access Private
@@ -24,6 +39,10 @@ router.post(
     const { id } = req.user;
     const { game, value } = req.body;
 
+    const ratedGame = await gameService.findOneById(game);
+
+    if (!ratedGame) return res.status(404).json({ message: 'Game not found' });
+
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -31,7 +50,7 @@ router.post(
     const duplicateRating = await ratingService.findDuplicateRating(id, game);
 
     if (duplicateRating)
-      return res.status(400).json({ message: 'Game already rated' });
+      return res.status(409).json({ message: 'Game already rated' });
 
     try {
       const newRating = {
@@ -61,39 +80,58 @@ router.post(
 // @route PUT api/ratings/update
 // @desc Update rating
 // @access Private
-router.put('/update', authenticate, async (req, res) => {
-  const { id, author, game, value } = req.body;
+router.put(
+  '/update',
+  [
+    authenticate,
+    [
+      body('game', 'Game is required.').not().isEmpty(),
+      body('value', 'Value is required.').not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    const { id, author, game, value } = req.body;
 
-  // Make sure user owns rating
-  if (author.toString() !== req.user.id)
-    return res.status(401).json({ message: 'Not authorized' });
+    // Make sure user owns rating
+    if (author.toString() !== req.user.id)
+      return res.status(401).json({ message: 'Not authorized' });
 
-  try {
-    let rating = await ratingService.findOneById(id);
+    const ratedGame = await gameService.findOneById(game);
 
-    if (!rating) return res.status(404).json({ message: 'Rating not found' });
+    if (!ratedGame) return res.status(404).json({ message: 'Game not found' });
 
-    // Build updated comment object
-    const updatedRating = {
-      value: value || rating.value,
-    };
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-    rating = await ratingService.updateRatingById(id, updatedRating);
+    try {
+      let rating = await ratingService.findOneById(id);
 
-    // Update concerned game average rating
-    const gameRatings = await ratingService.findByGameId(game);
-    const gameRatingsValues = gameRatings.map(({ value }) => value);
-    const averageRating =
-      gameRatingsValues.reduce((a, b) => a + b) / gameRatingsValues.length;
+      if (!rating) return res.status(404).json({ message: 'Rating not found' });
 
-    await gameService.updateGameById(game, { averageRating });
+      // Build updated comment object
+      const updatedRating = {
+        value: value || rating.value,
+      };
 
-    res.json(rating);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Server Error' });
+      rating = await ratingService.updateRatingById(id, updatedRating);
+
+      // Update concerned game average rating
+      const gameRatings = await ratingService.findByGameId(game);
+      const gameRatingsValues = gameRatings.map(({ value }) => value);
+      const averageRating =
+        gameRatingsValues.reduce((a, b) => a + b) / gameRatingsValues.length;
+
+      await gameService.updateGameById(game, { averageRating });
+
+      res.json(rating);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({ message: 'Server Error' });
+    }
   }
-});
+);
 
 // @route DELETE api/ratings/delete
 // @desc Delete rating
@@ -104,6 +142,10 @@ router.delete('/delete', authenticate, async (req, res) => {
   // Make sure user owns rating
   if (author.toString() !== req.user.id)
     return res.status(401).json({ message: 'Not authorized' });
+
+  const ratedGame = await gameService.findOneById(game);
+
+  if (!ratedGame) return res.status(404).json({ message: 'Game not found' });
 
   try {
     let rating = await ratingService.findOneById(id);
