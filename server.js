@@ -23,10 +23,6 @@ connectDB();
 // Init Middleware
 app.use(express.json({ extended: false }));
 
-app.get('/', (req, res) =>
-  res.json({ message: 'Welcome to the Game Maze App' })
-);
-
 // Define Routes
 app.use('/api/comments', comments);
 app.use('/api/games', games);

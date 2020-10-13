@@ -4,6 +4,7 @@
   "description": "Game manager app",
   "main": "server.js",
   "scripts": {
+    "biuld": "npx apidoc -i documentation -e node_modules/ -o ./docs",
     "start": "node server.js",
     "server": "nodemon server.js",
     "test": "jest --watchAll",
