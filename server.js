@@ -9,6 +9,7 @@ const games = require('./routes/games');
 const messages = require('./routes/messages');
 const ratings = require('./routes/ratings');
 const users = require('./routes/users');
+const docs = './docs';
 
 dotenv.config({ path: './config/config.env' });
 const ENV = process.env.NODE_ENV;
@@ -32,6 +33,7 @@ app.use('/api/games', games);
 app.use('/api/messages', messages);
 app.use('/api/ratings', ratings);
 app.use('/api/users', users);
+app.use('/api/docs', express.static(docs));
 
 app.listen(PORT, () =>
   console.log(`Server running in ${ENV} mode on port ${PORT}`.cyan.bold)
