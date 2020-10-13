@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "test": "NODE_ENV=test jest --watchAll"
+    "test": "jest --watchAll",
+    "docs": "npx apidoc -i documentation -e node_modules/ -o ./docs"
   },
   "keywords": [],
   "author": "DidiStf",
@@ -24,6 +25,7 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "apidoc": "^0.25.0",
     "concurrently": "^5.3.0",
     "jest": "^26.4.2",
     "nodemon": "^2.0.4"
