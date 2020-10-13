@@ -4,13 +4,13 @@ const CommentSchema = mongoose.Schema(
   {
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'users',
+      ref: 'user',
       required: true,
     },
     content: { type: String, min: 5, max: 255 },
     game: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'games',
+      ref: 'game',
       required: true,
     },
     title: { type: String, required: true, min: 3, max: 50 },

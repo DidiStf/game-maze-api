@@ -4,12 +4,12 @@ const RatingSchema = mongoose.Schema(
   {
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'users',
+      ref: 'user',
       required: true,
     },
     game: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'games',
+      ref: 'game',
       required: true,
     },
     value: { type: Number, required: true, min: 1, max: 5 },

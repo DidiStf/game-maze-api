@@ -10,8 +10,8 @@ const GameSchema = mongoose.Schema(
     platforms: [{ type: String, required: true }],
     publisher: String,
     releaseDate: String,
-    trailerUrl: String,
     title: { type: String, required: true },
+    trailerUrl: String,
   },
   { timestamps: true }
 );
