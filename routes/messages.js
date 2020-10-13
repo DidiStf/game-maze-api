@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 
 const authenticate = require('../middleware/authenticate');
 const messageService = require('../services/message');
+const userService = require('../services/user');
 
 const router = express.Router();
 
@@ -37,6 +38,11 @@ router.post(
     const errors = validationResult(req);
     const { id } = req.user;
     const { content, recipient, subject } = req.body;
+
+    const recipientUser = await userService.findOneById(recipient);
+
+    if (!recipientUser)
+      return res.status(404).json({ message: 'Recipient not found' });
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -83,6 +89,8 @@ router.delete('/delete', authenticate, async (req, res) => {
   // Make sure user owns message
   if (owner.toString() !== req.user.id)
     return res.status(401).json({ message: 'Not authorized' });
+
+  const recipientUser = await userService.findOneById(recipient);
 
   try {
     let message = await messageService.findOneById(id);

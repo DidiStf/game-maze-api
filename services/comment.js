@@ -1,9 +1,12 @@
 const UserComment = require('../models/Comment');
 
 exports.findByGameId = (id) =>
-  UserComment.find({ game: id }).sort({ createdAt: -1 });
+  UserComment.find({ game: id })
+    .populate('author', ['avatar', 'username'])
+    .sort({ createdAt: -1 });
 
-exports.findOneById = (id) => UserComment.findById(id);
+exports.findOneById = (id) =>
+  UserComment.findById(id).populate('author', ['avatar', 'username']);
 
 exports.saveComment = async (commentData) => {
   const newComment = new UserComment(commentData);

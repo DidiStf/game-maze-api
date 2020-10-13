@@ -1,9 +1,15 @@
 const Message = require('../models/Message');
 
 exports.findByOwnerId = (id) =>
-  Message.find({ owner: id }).sort({ createdAt: -1 });
+  Message.find({ owner: id })
+    .populate('recipient', ['avatar', 'username'])
+    .populate('sender', ['avatar', 'username'])
+    .sort({ createdAt: 1 });
 
-exports.findOneById = (id) => Message.findById(id);
+exports.findOneById = (id) =>
+  Message.findById(id)
+    .populate('recipient', ['avatar', 'username'])
+    .populate('sender', ['avatar', 'username']);
 
 exports.saveMessage = async (senderMessageData, recipientMessageData) => {
   const newMessageSender = new Message(senderMessageData);
