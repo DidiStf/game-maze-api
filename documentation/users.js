@@ -8,6 +8,7 @@
  * @apiPermission super-admin
  * @apiSuccess {Object[]} users List of all users
  * @apiUse UserListSuccessExample
+ * @apiUse NoSufficiantRightsError
  * @apiUse ServerError
  */
 

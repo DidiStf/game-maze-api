@@ -12,7 +12,13 @@ const router = express.Router();
 // @route GET api/users/
 // @desc Get all users
 // @access Private
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
+  const user = await userService.findOneById(req.user.id);
+
+  // Make sure user have admin rights
+  if (user.role !== 'super-admin')
+    return res.status(403).json({ message: 'No sufficiant rights.' });
+
   try {
     const users = await userService.findAll();
     res.json(users);
