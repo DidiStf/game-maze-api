@@ -19,7 +19,7 @@
  * @apiPermission public
  * @apiParam {String} id Game's ID
  * @apiExample {curl} Example usage:
- *     http://localhost/api/games/5f8305ee5d7dce5a88142c43
+ *     https://game-maze.herokuapp.com/api/games/5f8305ee5d7dce5a88142c43
  * @apiUse GameObjectSuccesParamsExample
  * @apiUse GameObjectSuccessExample
  * @apiUse GameNotFoundError

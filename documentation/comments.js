@@ -8,7 +8,7 @@
  * @apiPermission public
  * @apiParam {String} id Game's ID
  * @apiExample {curl} Example usage:
- *     http://localhost/api/comments/5f8305ee5d7dce5a88142c43
+ *     https://game-maze.herokuapp.com/api/comments/5f8305ee5d7dce5a88142c43
  * @apiSuccess {Object[]} comments List of all game's comments
  * @apiUse CommentListSuccessExample
  * @apiUse ServerError

@@ -8,7 +8,7 @@
  * @apiPermission public
  * @apiParam {String} id Game's ID
  * @apiExample {curl} Example usage:
- *     http://localhost/api/ratings/5f8305ee5d7dce5a88142c43
+ *     https://game-maze.herokuapp.com/api/ratings/5f8305ee5d7dce5a88142c43
  * @apiSuccess {Object[]} ratings List of all game's ratings
  * @apiUse RatingListSuccessExample
  * @apiUse ServerError
