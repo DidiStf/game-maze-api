@@ -7,9 +7,6 @@ const gameService = require('../services/game');
 
 const router = express.Router();
 
-// @route GET api/ratings/:id
-// @desc Get all ratings by game id
-// @access Public
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -22,9 +19,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// @route POST api/ratings/create
-// @desc Add new rating
-// @access Private
 router.post(
   '/create',
   [
@@ -77,9 +71,6 @@ router.post(
   }
 );
 
-// @route PUT api/ratings/update
-// @desc Update rating
-// @access Private
 router.put(
   '/update',
   [
@@ -133,9 +124,6 @@ router.put(
   }
 );
 
-// @route DELETE api/ratings/delete
-// @desc Delete rating
-// @access Private
 router.delete('/delete', authenticate, async (req, res) => {
   const { id, author, game } = req.body;
 

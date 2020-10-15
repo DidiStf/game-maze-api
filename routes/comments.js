@@ -7,9 +7,6 @@ const gameService = require('../services/game');
 
 const router = express.Router();
 
-// @route GET api/comments/:id
-// @desc Get all comments by game id
-// @access Public
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -22,9 +19,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// @route POST api/comments/create
-// @desc Add new comment
-// @access Private
 router.post(
   '/create',
   [
@@ -66,9 +60,6 @@ router.post(
   }
 );
 
-// @route PUT api/comments/update
-// @desc Update comment
-// @access Private
 router.put(
   '/update',
   [
@@ -117,9 +108,6 @@ router.put(
   }
 );
 
-// @route DELETE api/comments/delete
-// @desc Delete comment
-// @access Private
 router.delete('/delete', authenticate, async (req, res) => {
   const { id, author } = req.body;
 

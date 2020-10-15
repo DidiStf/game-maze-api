@@ -9,9 +9,6 @@ const userService = require('../services/user');
 
 const router = express.Router();
 
-// @route GET api/users/
-// @desc Get all users
-// @access Private
 router.get('/', authenticate, async (req, res) => {
   const user = await userService.findOneById(req.user.id);
 
@@ -30,9 +27,6 @@ router.get('/', authenticate, async (req, res) => {
 
 module.exports = router;
 
-// @route GET api/users/getOneByToken
-// @desc Get logged in user
-// @access Private
 router.get('/getOneByToken', authenticate, async (req, res) => {
   const { id } = req.user;
   try {
@@ -46,9 +40,6 @@ router.get('/getOneByToken', authenticate, async (req, res) => {
 
 module.exports = router;
 
-// @route POST api/users/create
-// @desc Register a user
-// @access Public
 router.post(
   '/create',
   [
@@ -111,9 +102,6 @@ router.post(
 
 module.exports = router;
 
-// @route POST api/users/login
-// @desc Login user and get token
-// @access Public
 router.post(
   '/login',
   [
@@ -167,9 +155,6 @@ router.post(
 
 module.exports = router;
 
-// @route PUT api/users/update
-// @desc Update user
-// @access Private
 router.put(
   '/update',
   [
@@ -242,9 +227,6 @@ router.put(
   }
 );
 
-// @route PUT api/users/setAdmin
-// @desc Set admin rights
-// @access Private Admin
 router.put(
   '/update/setAdmin',
   [authenticate, [body('role', 'Please enter a role').exists()]],
@@ -279,9 +261,6 @@ router.put(
   }
 );
 
-// @route DELETE api/users/delete
-// @desc Delete user
-// @access Private
 router.delete('/delete', authenticate, async (req, res) => {
   const userData = req.body;
   const { id } = userData;

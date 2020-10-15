@@ -7,9 +7,6 @@ const userService = require('../services/user');
 
 const router = express.Router();
 
-// @route GET api/messages
-// @desc Get all user's messages
-// @access Private
 router.get('/', authenticate, async (req, res) => {
   const { id } = req.user;
 
@@ -22,9 +19,6 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
-// @route POST api/messages/create
-// @desc Add new message
-// @access Private
 router.post(
   '/create',
   [
@@ -80,9 +74,6 @@ router.post(
   }
 );
 
-// @route DELETE api/messages/delete
-// @desc Delete message
-// @access Private
 router.delete('/delete', authenticate, async (req, res) => {
   const { id, owner } = req.body;
 

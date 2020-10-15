@@ -7,9 +7,6 @@ const userService = require('../services/user');
 
 const router = express.Router();
 
-// @route GET api/games/
-// @desc Get all games
-// @access Public
 router.get('/', async (req, res) => {
   try {
     const games = await gameService.findAll();
@@ -20,9 +17,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// @route GET api/games/:id
-// @desc Get one game
-// @access Public
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -35,9 +29,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// @route POST api/games/create
-// @desc Add game
-// @access Private
 router.post(
   '/create',
   [
@@ -97,9 +88,6 @@ router.post(
   }
 );
 
-// @route PUT api/games/update
-// @desc Update game
-// @access Private
 router.put(
   '/update',
   [
@@ -156,9 +144,6 @@ router.put(
   }
 );
 
-// @route DELETE api/games/delete
-// @desc Delete game
-// @access Private
 router.delete('/delete', authenticate, async (req, res) => {
   const gameData = req.body;
   const { id } = gameData;
