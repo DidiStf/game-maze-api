@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const authenticate = require('../middleware/authenticate');
 const commentService = require('../services/comment');
 const gameService = require('../services/game');
+const userService = require('../services/user');
 
 const router = express.Router();
 
@@ -109,10 +110,16 @@ router.put(
 );
 
 router.delete('/delete', authenticate, async (req, res) => {
-  const { id, author } = req.body;
+  const { id, author, game } = req.body;
 
-  // Make sure user owns comment
-  if (author.toString() !== req.user.id)
+  const user = await userService.findOneById(req.user.id);
+
+  // Make sure user owns comment or has admin rights
+  if (
+    author.toString() !== user.id &&
+    user.role !== 'admin' &&
+    user.role !== 'super-admin'
+  )
     return res.status(401).json({ message: 'Not authorized' });
 
   const commentedGame = await gameService.findOneById(game);
