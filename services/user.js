@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 exports.findOneByEmail = (email) => User.findOne({ email }).select('-password');
@@ -12,16 +11,7 @@ exports.findOneByUsername = (username) =>
 
 exports.findAll = () => User.find().select('-password');
 
-exports.saveUser = async (userData) => {
-  const { username, email, password } = userData;
-  const user = new User({ username, email, password });
-  const salt = await bcrypt.genSalt(10);
-
-  user.password = await bcrypt.hash(password, salt);
-  await user.save();
-
-  return user;
-};
+exports.saveUser = (userData) => User.create(userData);
 
 exports.updateUserById = (id, userData) =>
   User.findByIdAndUpdate(id, { $set: userData }, { new: true });
