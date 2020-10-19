@@ -14,8 +14,8 @@ router.get('/:id', async (req, res) => {
   try {
     const comments = await commentService.findByGameId(id);
     res.json(comments);
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });
@@ -54,8 +54,8 @@ router.post(
       const comment = await commentService.saveComment(newComment);
 
       res.json(comment);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -72,7 +72,7 @@ router.put(
   ],
   async (req, res) => {
     const errors = validationResult(req);
-    const { id, author, content, title } = req.body;
+    const { id, author, content, game, title } = req.body;
 
     // Make sure user owns comment
     if (author.toString() !== req.user.id)
@@ -102,8 +102,8 @@ router.put(
       comment = await commentService.updateCommentById(id, updatedComment);
 
       res.json(comment);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -135,8 +135,8 @@ router.delete('/delete', authenticate, async (req, res) => {
     await commentService.removeCommentById(id);
 
     res.json({ message: 'Comment deleted' });
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });

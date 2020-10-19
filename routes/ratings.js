@@ -13,8 +13,8 @@ router.get('/:id', async (req, res) => {
   try {
     const ratings = await ratingService.findByGameId(id);
     res.json(ratings);
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });
@@ -64,8 +64,8 @@ router.post(
       await gameService.updateGameById(game, { averageRating });
 
       res.json(rating);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -117,8 +117,8 @@ router.put(
       await gameService.updateGameById(game, { averageRating });
 
       res.json(rating);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -155,8 +155,8 @@ router.delete('/delete', authenticate, async (req, res) => {
     await gameService.updateGameById(game, { averageRating });
 
     res.json({ message: 'Rating deleted' });
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });
