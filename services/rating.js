@@ -9,12 +9,7 @@ exports.findByGameId = (id) =>
 exports.findOneById = (id) =>
   Rating.findById(id).populate('author', ['avatar', 'username']);
 
-exports.saveRating = async (ratingData) => {
-  const newRating = new Rating(ratingData);
-  const rating = await newRating.save();
-
-  return rating;
-};
+exports.saveRating = async (ratingData) => Rating.create(ratingData);
 
 exports.updateRatingById = (id, ratingData) =>
   Rating.findByIdAndUpdate(id, { $set: ratingData }, { new: true });

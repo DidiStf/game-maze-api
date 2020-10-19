@@ -11,14 +11,6 @@ exports.findOneById = (id) =>
     .populate('recipient', ['avatar', 'username'])
     .populate('sender', ['avatar', 'username']);
 
-exports.saveMessage = async (senderMessageData, recipientMessageData) => {
-  const newMessageSender = new Message(senderMessageData);
-  const newMessageRecipient = new Message(recipientMessageData);
-
-  const messageSender = await newMessageSender.save();
-  await newMessageRecipient.save();
-
-  return messageSender;
-};
+exports.saveMessage = async (messages) => Message.create(messages);
 
 exports.removeMessageById = (id) => Message.findByIdAndRemove(id);

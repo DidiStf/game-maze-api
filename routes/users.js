@@ -1,5 +1,4 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const { body, validationResult } = require('express-validator');
@@ -19,8 +18,8 @@ router.get('/', authenticate, async (req, res) => {
   try {
     const users = await userService.findAll();
     res.json(users);
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });
@@ -32,8 +31,8 @@ router.get('/getOneByToken', authenticate, async (req, res) => {
   try {
     let user = await userService.findOneById(id);
     res.json({ user });
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });
@@ -88,13 +87,13 @@ router.post(
           // Set token to expire in 3 hours
           expiresIn: 10800,
         },
-        (err, token) => {
-          if (err) throw err;
+        (error, token) => {
+          if (error) throw error;
           res.json({ token });
         }
       );
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).send('Server Error');
     }
   }
@@ -106,7 +105,7 @@ router.post(
   '/login',
   [
     body('email', 'Please include a valid email.').isEmail(),
-    body('password', 'Please enter a password.').exists(),
+    body('password', 'Please enter a password.').not().isEmpty(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -122,11 +121,11 @@ router.post(
         return res.status(401).json({ message: 'Inavlid credentials' });
       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
+      user.comparePassword(password, (_, match) => {
+        if (!match) {
+          return res.status(400).json({ message: 'Invalid credentials' });
+        }
+      });
 
       const payload = {
         user: {
@@ -141,13 +140,13 @@ router.post(
           // Set token to expire in 3 hours
           expiresIn: 10800,
         },
-        (err, token) => {
-          if (err) throw err;
+        (error, token) => {
+          if (error) throw error;
           res.json({ token });
         }
       );
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -161,7 +160,7 @@ router.put(
     authenticate,
     [
       body('email', 'Please include a valid email.').isEmail(),
-      body('username', 'Please enter a username.').exists(),
+      body('username', 'Please enter a username.').not().isEmpty(),
     ],
   ],
   async (req, res) => {
@@ -220,8 +219,8 @@ router.put(
       user = await userService.updateUserById(id, updatedUser);
 
       res.json(user);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -229,7 +228,7 @@ router.put(
 
 router.put(
   '/update/setAdmin',
-  [authenticate, [body('role', 'Please enter a role').exists()]],
+  [authenticate, [body('role', 'Please enter a role').not().isEmpty()]],
   async (req, res) => {
     const userData = req.body;
     const { id } = userData;
@@ -254,8 +253,8 @@ router.put(
       userToUpdate = await userService.updateUserById(id, updatedUser);
 
       res.json(userToUpdate);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -280,8 +279,8 @@ router.delete('/delete', authenticate, async (req, res) => {
     await userService.deleteUserById(id);
 
     res.json({ message: 'User deleted' });
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });

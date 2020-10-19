@@ -154,7 +154,7 @@
  * @apiDefine UpdateDeleteGameParamExample
  * @apiParamExample {json} Example Body:
  *      {
- *         "_id": "5f8305ee5d7dce5a88142c43",
+ *         "id": "5f8305ee5d7dce5a88142c43",
  *         "title": "Ori And The Blind Forest",
  *         "description": "Ori and the Blind Forest is a 2D platform game...",
  *         "genres": [
@@ -206,7 +206,7 @@
 
 /**
  * @apiDefine UpdateDeleteGameParams
- * @apiParam {String} _id The Game's ID
+ * @apiParam {String} id The Game's ID
  * @apiParam {String} description Description
  * @apiParam {String} developer Developer
  * @apiParam {String[]} genres List of game's genres
@@ -327,9 +327,9 @@
  * @apiDefine UpdateDeleteCommentParamExample
  * @apiParamExample {json} Example Body:
  *    {
- *     "_id": "5f8475e197f7c853443fc989",
+ *     "id": "5f8475e197f7c853443fc989",
  *     "author": {
- *          "_id": "5f7a43c38506ae29609f1dba",
+ *          "id": "5f7a43c38506ae29609f1dba",
  *          "avatar": "1",
  *          "username": "user1"
  *      },
@@ -362,7 +362,7 @@
 
 /**
  * @apiDefine UpdateDeleteCommentParams
- * @apiParam {String} _id The Comment's ID
+ * @apiParam {String} id The Comment's ID
  * @apiParam {Object} author Author's object
  * @apiParam {String} author._id Author's ID
  * @apiParam {String} author.avatar Author's avatar
@@ -484,7 +484,7 @@
  * @apiDefine DeleteMessageParamExample
  * @apiParamExample {json} Example Body:
  *    {
- *     "_id": "5f84b38866fccf5314dbbfd8",
+ *     "id": "5f84b38866fccf5314dbbfd8",
  *     "content": "Hello, nice to hear from you!",
  *     "owner": "5f8474c497f7c853443fc988",
  *     "recipient": {
@@ -525,7 +525,7 @@
 
 /**
  * @apiDefine DeleteMessageParams
- * @apiParam {String} _id The Message's ID
+ * @apiParam {String} id The Message's ID
  * @apiParam {String} content Content
  * @apiParam {String} owner Owner's ID
  * @apiParam {Object} recipient Recipient's object
@@ -636,7 +636,7 @@
  * @apiDefine UpdateDeleteRatingParamExample
  * @apiParamExample {json} Example Body:
  *    {
- *      "_id": "5f8572d308a0ec6ab8728f8a",
+ *      "id": "5f8572d308a0ec6ab8728f8a",
  *      "author": {
  *          "_id": "5f7a43c38506ae29609f1dba",
  *          "avatar": "1",
@@ -668,7 +668,7 @@
 
 /**
  * @apiDefine UpdateDeleteRatingParams
- * @apiParam {String} _id The Rating's ID
+ * @apiParam {String} id The Rating's ID
  * @apiParam {Object} author Author's object
  * @apiParam {String} author._id Author's ID
  * @apiParam {String} author.avatar Author's avatar
@@ -777,7 +777,7 @@
  * @apiParamExample {json} Example Body:
  *    {
  *      "role": "super-admin",
- *      "_id": "5f7a43c38506ae29609f1dba",
+ *      "id": "5f7a43c38506ae29609f1dba",
  *      "username": "user1",
  *      "email": "user1@mail.com",
  *      "createdAt": "2020-10-04T21:50:59.251Z",
@@ -810,7 +810,7 @@
 
 /**
  * @apiDefine UpdateDeleteUserParams
- * @apiParam {String} _id The User's ID
+ * @apiParam {String} id The User's ID
  * @apiParam {String} role User's Role
  * @apiParam {String} username Username
  * @apiParam {String} email Email

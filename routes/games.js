@@ -11,8 +11,8 @@ router.get('/', async (req, res) => {
   try {
     const games = await gameService.findAll();
     res.json(games);
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });
@@ -23,8 +23,8 @@ router.get('/:id', async (req, res) => {
     const game = await gameService.findOneById(id);
     if (!game) return res.status(404).json({ message: 'Game not found' });
     res.json(game);
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });
@@ -81,8 +81,8 @@ router.post(
       const game = await gameService.saveGame(newGame);
 
       res.json(game);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -137,8 +137,8 @@ router.put(
       game = await gameService.updateGameById(id, updatedGame);
 
       res.json(game);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -162,8 +162,8 @@ router.delete('/delete', authenticate, async (req, res) => {
     await gameService.removeGameById(id);
 
     res.json({ message: 'Game deleted' });
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });

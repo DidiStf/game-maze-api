@@ -13,8 +13,8 @@ router.get('/', authenticate, async (req, res) => {
   try {
     const messages = await messageService.findByOwnerId(id);
     res.json(messages);
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });
@@ -61,14 +61,14 @@ router.post(
         subject,
       };
 
-      const message = await messageService.saveMessage(
+      const message = await messageService.saveMessage([
         newMessageSender,
-        newMessageRecipient
-      );
+        newMessageRecipient,
+      ]);
 
       res.json(message);
-    } catch (err) {
-      console.error(err.message);
+    } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: 'Server Error' });
     }
   }
@@ -81,8 +81,6 @@ router.delete('/delete', authenticate, async (req, res) => {
   if (owner.toString() !== req.user.id)
     return res.status(401).json({ message: 'Not authorized' });
 
-  const recipientUser = await userService.findOneById(recipient);
-
   try {
     let message = await messageService.findOneById(id);
 
@@ -91,8 +89,8 @@ router.delete('/delete', authenticate, async (req, res) => {
     await messageService.removeMessageById(id);
 
     res.json({ message: 'Message deleted' });
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 });

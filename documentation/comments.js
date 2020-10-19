@@ -53,7 +53,7 @@
  * @apiVersion 1.0.0
  * @apiName DeleteComment
  * @apiGroup Comments
- * @apiPermission private
+ * @apiPermission private, admin
  * @apiUse Header
  * @apiUse UpdateDeleteCommentParams
  * @apiUse UpdateDeleteCommentParamExample
