@@ -23,7 +23,8 @@
     "express-validator": "^6.6.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.6",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "concurrently": "^5.3.0",
