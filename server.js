@@ -9,7 +9,7 @@ const games = require('./routes/games');
 const messages = require('./routes/messages');
 const ratings = require('./routes/ratings');
 const users = require('./routes/users');
-const wakeUpDyno = require('./utils/wokeDyno.js');
+const wakeUpDyno = require('./utils/wakeUpDyno');
 
 dotenv.config({ path: './config/config.env' });
 const ENV = process.env.NODE_ENV;
