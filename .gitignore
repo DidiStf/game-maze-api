@@ -1,3 +1,6 @@
 node_modules/
 .env
 docs/
+
+config/config.env
+config/default.json
