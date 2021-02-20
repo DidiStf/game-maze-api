@@ -32,6 +32,7 @@ app.use('/api/ratings', ratings);
 app.use('/api/users', users);
 
 app.listen(PORT, () => {
-  wakeUpDyno(DYNO_URL);
+  //sends a request to the server every 25 minutes to avoid sleeping (Heroku issue)
+  //wakeUpDyno(DYNO_URL);
   console.log(`Server running in ${ENV} mode on port ${PORT}`.cyan.bold);
 });
